@@ -8,10 +8,12 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import FormattedPrice from "./formatedPrice";
 import CartItem from "./CartItem";
+import { useEffect, useState } from "react";
 
 const CartContainer = () => {
-  const { cart = [] } = useSelector((state: StoreState) => state?.shoppers || {});
-  const dispatch = useDispatch();
+    const [totalAmt, setTotalAmt] = useState(0);
+    const { cart } = useSelector((state: StoreState) => state?.shoppers);
+    const dispatch = useDispatch();
 
   const handleResetCart = () => {
     const confirmed = window.confirm("Are you sure you want to reset your cart?");
@@ -20,6 +22,14 @@ const CartContainer = () => {
       toast.success("Cart reset successfully");
     }
   };
+  useEffect(() => {
+    let price = 0;
+    cart.map((item) => {
+      price += item?.price * item?.quantity;
+      return price;
+    });
+    setTotalAmt(price);
+  }, [cart]);
 
   return (
     <div>
@@ -56,13 +66,13 @@ const CartContainer = () => {
               <div>
                 <h1 className="text-2xl font-semibold text-center">Cart Totals</h1>
                   <div className="flex items-center justify-between border-[1px] border-gray-400 border-b-0 py-1.5 px-4 text-lg font-medium">
-                    Sub Total <FormattedPrice amount={250} />
+                    Sub Total <FormattedPrice amount={totalAmt} />
                   </div>
                   <div className="flex items-center justify-between border-[1px] border-gray-400 border-b-0 py-1.5 px-4 text-lg font-medium">
-                    Shipping Charges <FormattedPrice amount={250} />
+                    Shipping Charges  <FormattedPrice amount={0} />
                   </div>
                   <div className="flex items-center justify-between border-[1px] border-gray-400 border-b-1 py-1.5 px-4 text-lg font-medium">
-                    Total <FormattedPrice amount={500} />
+                    Total   <FormattedPrice amount={totalAmt} />
                   </div>
                
               </div>
